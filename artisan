@@ -1,10 +1,19 @@
 #!/usr/bin/env php
 <?php
 
+use App\Commands\StartCommand;
 use Symfony\Component\Console\Application;
 
 require_once __DIR__ . "/vendor/autoload.php";
 
 $application = new Application("ngx", "0.0.1");
+
+$commands = [
+    StartCommand::class,
+];
+
+foreach ($commands as $item) {
+    $application->add(new $item);
+}
 
 $application->run();

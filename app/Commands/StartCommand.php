@@ -16,7 +16,28 @@ class StartCommand extends Command
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $output->writeln("hello world");
+        $socket = \socket_create(\AF_INET, \SOCK_STREAM, \SOL_TCP);
+
+        \socket_bind($socket, "127.0.0.1", 7998);
+
+        \socket_listen($socket, 10);
+
+        for (;;) {
+            $conn = \socket_accept($socket);
+            if ($conn === false) {
+                usleep(100);
+            } else {
+                while (($read = \socket_read($conn, 10)) != false) {
+                    if (str_ends_with($read, "\r\n")) {
+                        break;
+                    }
+                }
+
+                \socket_write($conn, "hello world\n");
+                socket_close($conn);
+            }
+        }
+
         return Command::SUCCESS;
     }
 }
